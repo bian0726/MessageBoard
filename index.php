@@ -1,17 +1,49 @@
 <?php
+    require_once("conn.php"); //連接資料庫
+    $result = $mysqli->query("select * from MessageBoard"); //讀出所有訊息
+    $content = "";
+    while ($row = $result->fetch_assoc()) {
+        $content .=  $row['Name'] . " say：" .$row['Content'] . " - " . $row['Time'] . "\r\n"; //串接留言紀錄
+    }
 
+    if (!empty($_POST['userName']) && !empty($_POST['userMessage'])) { //新留言，階段一資料驗證
+        $userName = $_POST['userName'];
+        $userMessage = $_POST['userMessage'];
+        $insert_query = "INSERT INTO MessageBoard(Content, Name, Time)VALUES('$userMessage', '$userName', NOW())"; //新增留言
+        $mysqli->query($insert_query);
+        $mysqli->close();
+        header("Location: index.php"); //刷新畫面
+    }
 ?>
-!<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <link rel="stylesheet" href="main.css">
     <title>Bob_Bian MessageBoard</title>
   </head>
   <body>
-    <form class="" method="post">
-      <input type="text" name="userName" id="userName">
-      <input type="text" name="userMessage" id="userMessage">
-      <input type="submit" name="btnOK" id="btn">
+    <style>
+      input {
+          padding:5px 15px; 
+          background:#ccc; 
+          border:0 none;
+          -webkit-border-radius: 5px;
+          border-radius: 5px; 
+          font-size: 16px;
+          font-family: "Roboto Mono" ,monospace;
+      }
+    </style>
+    <h1>Message Board</h1>
+    <form action="index.php" method="post" style="width:500px">
+      User Name<br/>
+      <input style="width:50%" type="text" name="userName" id="userName" required=""><br/>
+      Your Message<br/>
+      <input style="width:75%" type="text" name="userMessage" id="userMessage" required="">
+      <input type="submit" name="btnOK" id="btnOK" value="Send">
+      <p></p>
+      <textarea style="width: 100%; height: 300px" name="allMessage" id="allMessage" ><?= $content ?></textarea>
     </form>
+    <p class="copy-right">&copy; 2019 Bian Yicheng. All Rights Reserved. Designed by Bob_Bian.</p>
   </body>
 </html>
